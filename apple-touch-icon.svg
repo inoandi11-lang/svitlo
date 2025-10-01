@@ -1,0 +1,18 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Фон з заокругленими кутами для iOS -->
+  <rect width="180" height="180" rx="40" ry="40" fill="url(#bgGradient)"/>
+  
+  <!-- Блискавка по центру -->
+  <path d="M90 30 L60 90 L75 90 L70 150 L120 90 L105 90 L110 30 Z" fill="#ffffff" stroke="#667eea" stroke-width="2"/>
+  
+  <!-- Додаткові деталі -->
+  <circle cx="60" cy="60" r="8" fill="#ffffff" opacity="0.2"/>
+  <circle cx="120" cy="120" r="6" fill="#ffffff" opacity="0.3"/>
+</svg>

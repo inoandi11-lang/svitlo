@@ -1,0 +1,24 @@
+{
+    "name": "ЕлектроБаланс",
+    "short_name": "ЕлектроБаланс",
+    "description": "Мобільна апка для відстеження споживання електроенергії та фінансового балансу",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#667eea",
+    "theme_color": "#667eea",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "favicon-32x32.svg",
+            "sizes": "32x32",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "apple-touch-icon.svg",
+            "sizes": "180x180",
+            "type": "image/svg+xml"
+        }
+    ],
+    "categories": ["utilities", "productivity"],
+    "lang": "uk"
+}
