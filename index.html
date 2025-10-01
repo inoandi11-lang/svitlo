@@ -11,7 +11,12 @@
     <!-- Головний екран -->
     <div id="main-screen" class="screen active">
         <header class="header">
-            <h1><i class="fas fa-bolt"></i> ЕлектроБаланс</h1>
+            <div class="header-top">
+                <h1><i class="fas fa-bolt"></i> ЕлектроБаланс</h1>
+                <button class="refresh-btn" onclick="refreshData()" title="Оновити дані">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
             <div class="balance-display">
                 <div class="total-balance">
                     <span class="balance-label">Загальний баланс</span>
@@ -24,7 +29,7 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-chart-line"></i>
-                    <h3>Середнє споживання</h3>
+                    <h3>Середнє споживання в день</h3>
                     <p class="stat-value" id="avg-consumption">0 кВт/день</p>
                     <p class="stat-subtitle">За весь час</p>
                 </div>
@@ -61,10 +66,13 @@
     <!-- Екран історії -->
     <div id="history-screen" class="screen">
         <header class="header">
-            <button class="back-btn" onclick="showScreen('main-screen')">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <h1>Історія місяців</h1>
+            <div class="header-top">
+                <button class="back-btn" onclick="showScreen('main-screen')">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1>Історія місяців</h1>
+                <div></div>
+            </div>
         </header>
 
         <main class="main-content">
@@ -97,10 +105,13 @@
     <!-- Екран додавання запису -->
     <div id="add-record-screen" class="screen">
         <header class="header">
-            <button class="back-btn" onclick="showScreen('main-screen')">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <h1>Додати показник</h1>
+            <div class="header-top">
+                <button class="back-btn" onclick="showScreen('main-screen')">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1>Додати показник</h1>
+                <div></div>
+            </div>
         </header>
 
         <main class="main-content">
@@ -147,10 +158,13 @@
     <!-- Екран налаштувань -->
     <div id="settings-screen" class="screen">
         <header class="header">
-            <button class="back-btn" onclick="showScreen('main-screen')">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <h1>Налаштування</h1>
+            <div class="header-top">
+                <button class="back-btn" onclick="showScreen('main-screen')">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1>Налаштування</h1>
+                <div></div>
+            </div>
         </header>
 
         <main class="main-content">
@@ -231,38 +245,6 @@
                         <!-- Список записів -->
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальне вікно редагування внеску -->
-    <div id="edit-payment-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="edit-payment-title">Редагування внеску</h2>
-                <button class="modal-close" onclick="closeEditPaymentModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-payment-form">
-                    <div class="form-group">
-                        <label for="edit-payment-amount">Сума внеску (Kč)</label>
-                        <input type="number" id="edit-payment-amount" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-payment-note">Примітка (необов'язково)</label>
-                        <input type="text" id="edit-payment-note" placeholder="Наприклад: Додатковий внесок">
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeEditPaymentModal()">
-                            Скасувати
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Зберегти
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

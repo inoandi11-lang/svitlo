@@ -35,6 +35,12 @@ body {
     z-index: 100;
 }
 
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .header h1 {
     font-size: 24px;
     font-weight: 600;
@@ -42,10 +48,50 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin: 0;
 }
 
 .header h1 i {
     color: #667eea;
+}
+
+.refresh-btn {
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #667eea;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+}
+
+.refresh-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: scale(1.05);
+}
+
+.refresh-btn:active {
+    transform: scale(0.95);
+}
+
+.refresh-btn i {
+    transition: transform 0.3s;
+}
+
+.refresh-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .back-btn {
@@ -252,6 +298,20 @@ body {
     font-size: 16px;
     transition: border-color 0.2s;
     background: white;
+}
+
+/* Виправлення для date input на мобільних */
+.form-group input[type="date"] {
+    min-height: 48px;
+    font-size: 16px; /* Запобігає зуму на iOS */
+}
+
+@media (max-width: 480px) {
+    .form-group input[type="date"] {
+        padding: 10px 12px;
+        font-size: 14px;
+        min-height: 44px;
+    }
 }
 
 .form-group input:focus {
@@ -627,17 +687,6 @@ body {
 .btn-delete:hover {
     background: #fee2e2;
     border-color: #fca5a5;
-}
-
-/* Модальні дії */
-.modal-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.modal-actions .btn {
-    flex: 1;
 }
 
 /* Інтерактивність таблиці */
