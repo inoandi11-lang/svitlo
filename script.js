@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     updateMainScreen();
     updateHistoryScreen();
     updateSettingsForm();
+    
+    // Додаємо обробник форми редагування внеску
+    document.getElementById('edit-payment-form').addEventListener('submit', savePayment);
 });
 
 // Завантаження даних з localStorage
@@ -243,7 +246,8 @@ function getMonthlyData() {
     
     // Розраховуємо баланс для кожного місяця
     Object.values(monthlyData).forEach(month => {
-        month.balance = appData.settings.monthly_payment - month.cost;
+        const customPayment = month.customPayment || appData.settings.monthly_payment;
+        month.balance = customPayment - month.cost;
     });
     
     return monthlyData;
@@ -251,7 +255,7 @@ function getMonthlyData() {
 
 // Оновлення головного екрану
 function updateMainScreen() {
-    const monthlyData = getMonthlyData();
+    const monthlyData = getMonthlyDataWithCustomPayments();
     const months = Object.values(monthlyData);
     
     // Загальне споживання
@@ -322,7 +326,7 @@ function updateMainScreen() {
 
 // Оновлення екрану історії
 function updateHistoryScreen() {
-    const monthlyData = getMonthlyData();
+    const monthlyData = getMonthlyDataWithCustomPayments();
     const tbody = document.getElementById('history-tbody');
     tbody.innerHTML = '';
     
@@ -347,11 +351,18 @@ function updateHistoryScreen() {
             `${month.totalConsumption.toFixed(0)} кВт ~` : 
             `${month.totalConsumption.toFixed(0)} кВт`;
         
+        const customPayment = month.customPayment || appData.settings.monthly_payment;
+        const paymentText = month.customPayment ? 
+            `${customPayment.toFixed(0)} Kč <i class="fas fa-edit" style="font-size: 10px; color: #666;"></i>` : 
+            `${customPayment.toFixed(0)} Kč`;
+        
         row.innerHTML = `
             <td>${monthDisplay}</td>
             <td>${consumptionText}</td>
             <td>${month.cost.toFixed(0)} Kč</td>
-            <td>${appData.settings.monthly_payment} Kč</td>
+            <td onclick="event.stopPropagation(); editPayment('${month.month}', ${customPayment})" style="cursor: pointer; position: relative;">
+                ${paymentText}
+            </td>
             <td class="${balanceClass}">
                 <i class="${balanceIcon} balance-icon"></i>
                 ${month.balance.toFixed(0)} Kč
@@ -480,9 +491,9 @@ function updateChart(months) {
     const barSpacing = canvas.width / months.length * 0.2;
     
     months.forEach((month, index) => {
-        const barHeight = (month.totalConsumption / maxConsumption) * (canvas.height - 40);
+        const barHeight = (month.totalConsumption / maxConsumption) * (canvas.height - 80);
         const x = index * (barWidth + barSpacing) + barSpacing / 2;
-        const y = canvas.height - barHeight - 20;
+        const y = canvas.height - barHeight - 60;
         
         // Колір залежно від балансу
         const color = month.balance > 0 ? '#10b981' : '#ef4444';
@@ -497,6 +508,19 @@ function updateChart(months) {
         const [year, monthNum] = month.month.split('-');
         const monthDisplay = `${monthNum}.${year}`;
         ctx.fillText(monthDisplay, x + barWidth / 2, canvas.height - 5);
+        
+        // Показуємо кіловати на стовпці
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 9px Arial';
+        ctx.textAlign = 'center';
+        const kwhText = `${month.totalConsumption.toFixed(0)} кВт`;
+        ctx.fillText(kwhText, x + barWidth / 2, y - 5);
+        
+        // Показуємо вартість під стовпцем
+        ctx.fillStyle = '#666';
+        ctx.font = '8px Arial';
+        const costText = `${month.cost.toFixed(0)} Kč`;
+        ctx.fillText(costText, x + barWidth / 2, y + barHeight + 15);
     });
 }
 
@@ -548,6 +572,10 @@ function showMonthDetails(month) {
     const stats = document.getElementById('modal-month-stats');
     const recordsList = document.getElementById('modal-records-list');
     
+    // Отримуємо дані з індивідуальними внесками
+    const monthlyData = getMonthlyDataWithCustomPayments();
+    const monthWithCustomPayment = monthlyData[month.month] || month;
+    
     // Форматуємо назву місяця
     const [year, monthNum] = month.month.split('-');
     const monthName = new Date(month.month + '-01').toLocaleDateString('uk-UA', { 
@@ -558,24 +586,28 @@ function showMonthDetails(month) {
     title.textContent = `${monthName} (${monthNum}.${year})`;
     
     // Статистика місяця
-    const balanceClass = month.balance > 0 ? 'balance-positive' : 
-                        month.balance < 0 ? 'balance-negative' : 'balance-zero';
+    const balanceClass = monthWithCustomPayment.balance > 0 ? 'balance-positive' : 
+                        monthWithCustomPayment.balance < 0 ? 'balance-negative' : 'balance-zero';
+    
+    const customPayment = monthWithCustomPayment.customPayment || appData.settings.monthly_payment;
+    const paymentNote = monthWithCustomPayment.paymentNote ? 
+        ` <small style="color: #666;">(${monthWithCustomPayment.paymentNote})</small>` : '';
     
     stats.innerHTML = `
         <div class="month-stat-item">
-            <div class="month-stat-value">${month.totalConsumption.toFixed(0)} кВт</div>
+            <div class="month-stat-value">${monthWithCustomPayment.totalConsumption.toFixed(0)} кВт</div>
             <div class="month-stat-label">Спожито</div>
         </div>
         <div class="month-stat-item">
-            <div class="month-stat-value">${month.cost.toFixed(0)} Kč</div>
+            <div class="month-stat-value">${monthWithCustomPayment.cost.toFixed(0)} Kč</div>
             <div class="month-stat-label">Вартість</div>
         </div>
         <div class="month-stat-item">
-            <div class="month-stat-value">${appData.settings.monthly_payment} Kč</div>
+            <div class="month-stat-value">${customPayment.toFixed(0)} Kč${paymentNote}</div>
             <div class="month-stat-label">Внесок</div>
         </div>
         <div class="month-stat-item">
-            <div class="month-stat-value ${balanceClass}">${month.balance.toFixed(0)} Kč</div>
+            <div class="month-stat-value ${balanceClass}">${monthWithCustomPayment.balance.toFixed(0)} Kč</div>
             <div class="month-stat-label">Баланс</div>
         </div>
     `;
@@ -630,7 +662,7 @@ function deleteRecord(monthKey, recordIndex) {
     }
     
     // Знаходимо запис в загальному масиві
-    const monthlyData = getMonthlyData();
+    const monthlyData = getMonthlyDataWithCustomPayments();
     const month = monthlyData[monthKey];
     
     if (month && month.records[recordIndex]) {
@@ -672,5 +704,88 @@ document.addEventListener('click', function(event) {
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
         closeMonthModal();
+        closeEditPaymentModal();
     }
 });
+
+// Редагування внеску для місяця
+function editPayment(monthKey, currentAmount) {
+    const modal = document.getElementById('edit-payment-modal');
+    const title = document.getElementById('edit-payment-title');
+    const amountInput = document.getElementById('edit-payment-amount');
+    
+    // Форматуємо назву місяця
+    const [year, monthNum] = monthKey.split('-');
+    const monthName = new Date(monthKey + '-01').toLocaleDateString('uk-UA', { 
+        month: 'long', 
+        year: 'numeric' 
+    });
+    
+    title.textContent = `Редагування внеску - ${monthName}`;
+    amountInput.value = currentAmount;
+    
+    // Зберігаємо поточний місяць для збереження
+    modal.dataset.monthKey = monthKey;
+    
+    modal.classList.add('active');
+}
+
+// Закриття модального вікна редагування внеску
+function closeEditPaymentModal() {
+    const modal = document.getElementById('edit-payment-modal');
+    modal.classList.remove('active');
+    document.getElementById('edit-payment-form').reset();
+}
+
+// Збереження внеску
+function savePayment(event) {
+    event.preventDefault();
+    
+    const modal = document.getElementById('edit-payment-modal');
+    const monthKey = modal.dataset.monthKey;
+    const amount = parseFloat(document.getElementById('edit-payment-amount').value);
+    const note = document.getElementById('edit-payment-note').value;
+    
+    if (!monthKey || isNaN(amount)) {
+        alert('Помилка: некоректні дані');
+        return;
+    }
+    
+    // Зберігаємо індивідуальний внесок для місяця
+    if (!appData.customPayments) {
+        appData.customPayments = {};
+    }
+    
+    appData.customPayments[monthKey] = {
+        amount: amount,
+        note: note || null,
+        updatedAt: new Date().toISOString()
+    };
+    
+    saveData();
+    
+    // Оновлюємо екрани
+    updateMainScreen();
+    updateHistoryScreen();
+    
+    closeEditPaymentModal();
+    alert('Внесок збережено успішно!');
+}
+
+// Оновлюємо функцію getMonthlyData для врахування індивідуальних внесків
+function getMonthlyDataWithCustomPayments() {
+    const monthlyData = getMonthlyData();
+    
+    // Додаємо індивідуальні внески
+    if (appData.customPayments) {
+        Object.keys(appData.customPayments).forEach(monthKey => {
+            if (monthlyData[monthKey]) {
+                monthlyData[monthKey].customPayment = appData.customPayments[monthKey].amount;
+                monthlyData[monthKey].paymentNote = appData.customPayments[monthKey].note;
+            }
+        });
+    }
+    
+    return monthlyData;
+}
+
