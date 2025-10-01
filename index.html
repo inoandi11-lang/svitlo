@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЕлектроБаланс</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Головний екран -->
+    <div id="main-screen" class="screen active">
+        <header class="header">
+            <h1><i class="fas fa-bolt"></i> ЕлектроБаланс</h1>
+            <div class="balance-display">
+                <div class="total-balance">
+                    <span class="balance-label">Загальний баланс</span>
+                    <span id="total-balance" class="balance-amount">0 Kč</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Середнє споживання</h3>
+                    <p class="stat-value" id="avg-consumption">0 кВт/день</p>
+                    <p class="stat-subtitle">За весь час</p>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Останній місяць</h3>
+                    <p class="stat-value" id="last-month-consumption">0 кВт/день</p>
+                    <p class="stat-subtitle">Середнє за місяць</p>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fas fa-wallet"></i>
+                    <h3>Баланс місяця</h3>
+                    <p class="stat-value" id="month-balance">0 Kč</p>
+                    <p class="stat-subtitle" id="month-balance-subtitle">Поточний місяць</p>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>Вартість місяця</h3>
+                    <p class="stat-value" id="month-cost">0 Kč</p>
+                    <p class="stat-subtitle">Спожито + внесок</p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3><i class="fas fa-chart-line"></i> Споживання по місяцях</h3>
+                <canvas id="consumption-chart" width="300" height="200"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <!-- Екран історії -->
+    <div id="history-screen" class="screen">
+        <header class="header">
+            <button class="back-btn" onclick="showScreen('main-screen')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Історія місяців</h1>
+        </header>
+
+        <main class="main-content">
+            <div class="info-box" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+                <p style="margin: 0; font-size: 14px; color: #666;">
+                    <i class="fas fa-info-circle" style="color: #667eea; margin-right: 8px;"></i>
+                    Перший місяць розраховується приблизно на основі середнього споживання. 
+                    Значок "~" вказує на приблизний розрахунок.
+                </p>
+            </div>
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Місяць</th>
+                            <th>Спожито<br><small>(кіловат)</small></th>
+                            <th>Вартість<br><small>(корон)</small></th>
+                            <th>Внесок<br><small>(корон)</small></th>
+                            <th>Баланс<br><small>(корон)</small></th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <!-- Дані будуть додані через JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Екран додавання запису -->
+    <div id="add-record-screen" class="screen">
+        <header class="header">
+            <button class="back-btn" onclick="showScreen('main-screen')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Додати показник</h1>
+        </header>
+
+        <main class="main-content">
+            <form id="add-record-form" class="add-record-form">
+                <div class="form-group">
+                    <label for="record-date">Дата</label>
+                    <input type="date" id="record-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="vt-reading">VT (денний тариф)</label>
+                    <input type="number" id="vt-reading" placeholder="Введіть показник VT">
+                </div>
+
+                <div class="form-group">
+                    <label for="nt-reading">NT (нічний тариф)</label>
+                    <input type="number" id="nt-reading" placeholder="Введіть показник NT">
+                </div>
+
+                <div class="form-group">
+                    <label for="total-reading">Або загальний показник</label>
+                    <input type="number" id="total-reading" placeholder="Введіть загальний показник">
+                </div>
+
+                <div id="preview-section" class="preview-section" style="display: none;">
+                    <h3>Попередній перегляд</h3>
+                    <div class="preview-item">
+                        <span>Спожито кВт:</span>
+                        <span id="preview-consumption">0</span>
+                    </div>
+                    <div class="preview-item">
+                        <span>Вартість:</span>
+                        <span id="preview-cost">0 Kč</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Додати запис
+                </button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Екран налаштувань -->
+    <div id="settings-screen" class="screen">
+        <header class="header">
+            <button class="back-btn" onclick="showScreen('main-screen')">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Налаштування</h1>
+        </header>
+
+        <main class="main-content">
+            <div class="settings-form">
+                <div class="form-group">
+                    <label for="price-per-kwh">Ціна за кВт (Kč)</label>
+                    <input type="number" id="price-per-kwh" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthly-payment">Щомісячний внесок (Kč)</label>
+                    <input type="number" id="monthly-payment" required>
+                </div>
+
+                <div class="settings-actions">
+                    <button type="button" class="btn btn-secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Експорт даних
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('import-file').click()">
+                        <i class="fas fa-upload"></i> Імпорт даних
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="loadSampleData()" style="background: #f0f9ff; color: #0369a1; border-color: #bae6fd;">
+                        <i class="fas fa-database"></i> Завантажити тестові дані
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="clearData()" style="background: #fef2f2; color: #dc2626; border-color: #fecaca;">
+                        <i class="fas fa-trash"></i> Очистити дані
+                    </button>
+
+                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+                </div>
+
+                <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Зберегти налаштування
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Нижня навігація -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" onclick="showScreen('main-screen')">
+            <i class="fas fa-home"></i>
+            <span>Головна</span>
+        </button>
+        <button class="nav-btn" onclick="showScreen('history-screen')">
+            <i class="fas fa-history"></i>
+            <span>Історія</span>
+        </button>
+        <button class="nav-btn" onclick="showScreen('add-record-screen')">
+            <i class="fas fa-plus"></i>
+            <span>Додати</span>
+        </button>
+        <button class="nav-btn" onclick="showScreen('settings-screen')">
+            <i class="fas fa-cog"></i>
+            <span>Налаштування</span>
+        </button>
+    </nav>
+
+    <!-- Модальне вікно деталей місяця -->
+    <div id="month-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-month-title">Деталі місяця</h2>
+                <button class="modal-close" onclick="closeMonthModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-month-stats" class="month-stats">
+                    <!-- Статистика місяця -->
+                </div>
+                <div class="records-list">
+                    <h3>Записи за місяць</h3>
+                    <div id="modal-records-list">
+                        <!-- Список записів -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
