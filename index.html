@@ -235,6 +235,38 @@
         </div>
     </div>
 
+    <!-- Модальне вікно редагування внеску -->
+    <div id="edit-payment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="edit-payment-title">Редагування внеску</h2>
+                <button class="modal-close" onclick="closeEditPaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-payment-form">
+                    <div class="form-group">
+                        <label for="edit-payment-amount">Сума внеску (Kč)</label>
+                        <input type="number" id="edit-payment-amount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-payment-note">Примітка (необов'язково)</label>
+                        <input type="text" id="edit-payment-note" placeholder="Наприклад: Додатковий внесок">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditPaymentModal()">
+                            Скасувати
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Зберегти
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
