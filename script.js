@@ -214,11 +214,11 @@ function calculateCost(kwh) {
 function getMonthlyData() {
     const monthlyData = {};
     
-    // Сортуємо записи за датою
+    // Спочатку створюємо структуру місяців
     const sortedRecords = [...appData.records].sort((a, b) => new Date(a.date) - new Date(b.date));
     
-    for (let i = 0; i < sortedRecords.length; i++) {
-        const record = sortedRecords[i];
+    // Створюємо місяці для всіх записів
+    sortedRecords.forEach(record => {
         const date = new Date(record.date);
         const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
         
@@ -233,12 +233,35 @@ function getMonthlyData() {
         }
         
         monthlyData[monthKey].records.push(record);
+    });
+    
+    // Тепер розраховуємо споживання між записами
+    for (let i = 1; i < sortedRecords.length; i++) {
+        const currentRecord = sortedRecords[i];
+        const previousRecord = sortedRecords[i - 1];
         
-        // Розраховуємо споживання
-        const previousRecord = i > 0 ? sortedRecords[i - 1] : null;
-        const consumption = calculateConsumption(record, previousRecord);
-        monthlyData[monthKey].totalConsumption += consumption;
-        monthlyData[monthKey].cost += calculateCost(consumption);
+        const consumption = calculateConsumption(currentRecord, previousRecord);
+        
+        // Розподіляємо споживання пропорційно дням між записами
+        const startDate = new Date(previousRecord.date);
+        const endDate = new Date(currentRecord.date);
+        const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+        
+        if (totalDays > 0) {
+            // Розподіляємо по днях
+            for (let day = 0; day < totalDays; day++) {
+                const dayDate = new Date(startDate);
+                dayDate.setDate(startDate.getDate() + day);
+                
+                const dayMonthKey = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}`;
+                
+                if (monthlyData[dayMonthKey]) {
+                    const dailyConsumption = consumption / totalDays;
+                    monthlyData[dayMonthKey].totalConsumption += dailyConsumption;
+                    monthlyData[dayMonthKey].cost += calculateCost(dailyConsumption);
+                }
+            }
+        }
     }
     
     // Розраховуємо баланс для кожного місяця
