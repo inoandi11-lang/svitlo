@@ -308,9 +308,17 @@ body {
 
 @media (max-width: 480px) {
     .form-group input[type="date"] {
-        padding: 10px 12px;
-        font-size: 14px;
-        min-height: 44px;
+        padding: 8px 10px;
+        font-size: 13px;
+        min-height: 40px;
+    }
+}
+
+@media (max-width: 360px) {
+    .form-group input[type="date"] {
+        padding: 6px 8px;
+        font-size: 12px;
+        min-height: 36px;
     }
 }
 
@@ -492,6 +500,12 @@ body {
     .history-table td {
         padding: 8px 4px;
         font-size: 11px;
+    }
+    
+    .form-group input[type="date"] {
+        padding: 4px 6px;
+        font-size: 11px;
+        min-height: 32px;
     }
 }
 
