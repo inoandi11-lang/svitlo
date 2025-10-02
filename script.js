@@ -715,3 +715,10 @@ function refreshData() {
         
     }, 800); // Невелика затримка для показу анімації
 }
+
+// Відкриття календаря
+function openDatePicker() {
+    const dateInput = document.getElementById('record-date');
+    dateInput.focus();
+    dateInput.showPicker(); // Сучасні браузери
+}

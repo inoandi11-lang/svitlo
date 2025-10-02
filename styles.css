@@ -306,19 +306,75 @@ body {
     font-size: 16px; /* Запобігає зуму на iOS */
 }
 
+/* Обгортка для поля дати з кнопкою */
+.date-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.date-input-wrapper input[type="date"] {
+    flex: 1;
+    padding-right: 50px; /* Місце для кнопки */
+}
+
+.date-picker-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(102, 126, 234, 0.1);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #667eea;
+    font-size: 14px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.date-picker-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.date-picker-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
 @media (max-width: 480px) {
     .form-group input[type="date"] {
-        padding: 8px 10px;
+        padding: 8px 45px 8px 10px;
         font-size: 13px;
         min-height: 40px;
+    }
+    
+    .date-picker-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+        right: 6px;
     }
 }
 
 @media (max-width: 360px) {
     .form-group input[type="date"] {
-        padding: 6px 8px;
+        padding: 6px 40px 6px 8px;
         font-size: 12px;
         min-height: 36px;
+    }
+    
+    .date-picker-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+        right: 4px;
     }
 }
 
@@ -503,9 +559,16 @@ body {
     }
     
     .form-group input[type="date"] {
-        padding: 4px 6px;
+        padding: 4px 35px 4px 6px;
         font-size: 11px;
         min-height: 32px;
+    }
+    
+    .date-picker-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+        right: 3px;
     }
 }
 
